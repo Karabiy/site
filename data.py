@@ -7,7 +7,7 @@ from sqlalchemy.dialects.oracle import \
     DOUBLE_PRECISION, FLOAT, INTERVAL, LONG, NCLOB, \
     NUMBER, NVARCHAR, NVARCHAR2, RAW, TIMESTAMP, VARCHAR, \
     VARCHAR2
-
+import binascii
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import os
@@ -25,22 +25,23 @@ cursor = engine.connect()
 class User(UserMixin, Base):
     __tablename__ = 'user'
     
-    id = Column(NUMBER, primary_key=True, autoincrement=True, default=int(1))
+    id = Column(RAW(255), server_default=text("SYS_GUID()"), primary_key=True)
     nickname = Column(VARCHAR2(20), unique=True, nullable=False)
     password = Column(VARCHAR2(100), nullable=False)
-    
-#    post = relationship('Post', back_populates='id', cascade="all, delete, delete-orphan")
-#    role = relationship('Role', back_populates='id', cascade="all, delete, delete-orphan")
     
     def __init__(self, nickname, password):
         self.nickname = nickname
         self.password = generate_password_hash(password)
+        self.id = session.query(User).filter_by(nickname=self.nickname).all()[0].id
     
     def __repr__(self):
         return self.nickname
     
     def get_id(self):
         return self.id
+    
+    def to_id(self):
+        return binascii.a2b_hex(self.id)
     
     def password_check(self, password):
         return check_password_hash(self.password, password)
@@ -49,14 +50,15 @@ class User(UserMixin, Base):
 class Role(Base):
     __tablename__ = 'role'
     
-    id = Column(NUMBER, ForeignKey('user.id'), primary_key=True, nullable=False)
+    id = Column(RAW(255), ForeignKey('user.id'), primary_key=True)
     
     roles = ['admin', 'teacher', 'student']
     for i in roles:
         exec(i + ' = Column(Boolean,default=False,nullable=False)')
     
     def __init__(self,id, args):
-        self.id = int(id)
+        print(id)
+        self.id = id
         print(args)
         for i in args:
             if i in self.roles:
@@ -80,8 +82,6 @@ class Post(Base):
     post_data = Column(VARCHAR2(255), nullable=False)
     nickname = Column(VARCHAR2(20), ForeignKey('user.nickname'), nullable=False)
     
-    #user = relationship("user", order_by=User.id, back_populates='post')
-    
     def __init__(self, post_data, User):
         self.post_data = post_data
         self.nickname = User.nickname
@@ -93,11 +93,15 @@ class Post(Base):
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
-session.add(Role(int(1), ['admin']))
+a = User("gay","gay")
+#session.add(a)
+#session.flush()
+#session.add(Role(a.get_id(), ['admin']))
 #.commit()
-session.flush()
+#session.flush()
 #session.close()
-print(session.query(User).all())
+print(a.get_id())
+
 """
 class Student(Base):
     __tablename__ = 'student'
