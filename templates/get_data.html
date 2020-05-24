@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>Login Page</title>
+    </head>
+    <body>
+        <p>
+        <form action="{{ url_for('controller_handler_post',action=action)}}"  method="POST">
+            Name
+            <input type="text" name="name" value="{{entity.name}}" />
+            <p>
+            Surname
+            <input type="text" name="surname" value="{{entity.surname}}" />
+            <p>
+            Details
+            <input type="text" name="details" value="{{entity.details}}"/>
+        <p>
+
+            <button type="submit" value="submit" >
+                click me
+            </button>
+        </form>
+    </body>
+</html>
