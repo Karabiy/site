@@ -10,13 +10,16 @@ from sqlalchemy.dialects.oracle import \
 import binascii
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+import time
+from datetime import date
+import uuid
 import os
 
 os.environ['LD_LIBRARY_PATH'] = "/usr/lib/oracle/18.5/client64/lib"
 os.environ['ORACLE_HOME'] = "/usr/lib/oracle/18.5/client64/"
 
-engine = create_engine('oracle+cx_oracle://cherry:mypassword@localhost:51521/xe', echo=False, \
-                       max_identifier_length=128)
+engine = create_engine('oracle+cx_oracle://cherry:mypassword@localhost:51521/xe', max_identifier_length=128, \
+                       echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 session = Session(autocommit=True)
@@ -25,32 +28,29 @@ cursor = engine.connect()
 class User(UserMixin, Base):
     __tablename__ = 'user'
     
-    id = Column(RAW(255), server_default=text("SYS_GUID()"), primary_key=True)
+    id = Column(VARCHAR2(255), primary_key=True)
     nickname = Column(VARCHAR2(20), unique=True, nullable=False)
     password = Column(VARCHAR2(100), nullable=False)
     
     def __init__(self, nickname, password):
         self.nickname = nickname
         self.password = generate_password_hash(password)
-        self.id = session.query(User).filter_by(nickname=self.nickname).all()[0].id
-    
+        self.id = str(uuid.uuid4())
+        
     def __repr__(self):
         return self.nickname
     
     def get_id(self):
         return self.id
     
-    def to_id(self):
-        return binascii.a2b_hex(self.id)
-    
     def password_check(self, password):
         return check_password_hash(self.password, password)
-
-
+    
+        
 class Role(Base):
     __tablename__ = 'role'
     
-    id = Column(RAW(255), ForeignKey('user.id'), primary_key=True)
+    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True)
     
     roles = ['admin', 'teacher', 'student']
     for i in roles:
@@ -65,36 +65,53 @@ class Role(Base):
                 exec("self." + i + " =True")
 
 
-'''
-class Activity(Base):
-	
-	__tablename__ = 'activity'
-	
-	activity = Column(NUMBER)
-	lastActivity = Column(VARCHAR2(255))
-'''
-
-
 class Post(Base):
     __tablename__ = 'post'
     
-    post_id = Column(NUMBER, primary_key=True)
-    post_data = Column(VARCHAR2(255), nullable=False)
-    nickname = Column(VARCHAR2(20), ForeignKey('user.nickname'), nullable=False)
+    id = Column(VARCHAR2(255), primary_key=True)
     
-    def __init__(self, post_data, User):
-        self.post_data = post_data
-        self.nickname = User.nickname
-        User.activity += 1
+    user_id = Column(VARCHAR2(255), ForeignKey('user.id'))
     
-    def __repr__(self):
-        return self.post_data + '@ by ' + self.nickname
+    body = Column(VARCHAR2(255))
+    
+    date = Column(NUMBER)
+    
+    def __init__(self, body, user_id):
+        self.id = str(uuid.uuid4())
+        
+        self.date = time.time()
+        
+        self.body = body
+        
+        self.user_id = user_id
+
+
+class Activity(Base):
+    __tablename__ = 'activity'
+    
+    id = Column(VARCHAR2(255), ForeignKey('user.id'), nullable=False)
+
+    activity_count = Column(NUMBER, default=0)
+    lastActivity = Column(VARCHAR2(255))
+    
+    def __init__(self, User):
+        
+        self.id = User.get_id()
+        
+        self.lastActivity = str(date.today())
+        
+    def activity_event(self):
+        
+        self.lastActivity = str(date.today())
+        
+        self.activity_count += 1
+        
 
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
 a = User("gay","gay")
-#session.add(a)
+session.add(a)
 #session.flush()
 #session.add(Role(a.get_id(), ['admin']))
 #.commit()
