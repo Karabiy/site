@@ -22,11 +22,13 @@ engine = create_engine('oracle+cx_oracle://cherry:mypassword@localhost:51521/xe'
                        echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
-session = Session(autocommit=True)
+session = Session(autocommit=True,autoflush=True)
 cursor = engine.connect()
 
 class User(UserMixin, Base):
+    
     __tablename__ = 'user'
+    
     
     id = Column(VARCHAR2(255), primary_key=True)
     nickname = Column(VARCHAR2(20), unique=True, nullable=False)
@@ -43,29 +45,68 @@ class User(UserMixin, Base):
     def get_id(self):
         return self.id
     
+    def create_activity(self):
+        return Activity(self)
+    
+    def login(self,device='127.0.0.1'):
+        users_sessions = session.query(Status).filter_by(id=self.get_id()).all()
+        for users_session in users_sessions:
+            if users_session.device == device:
+                users_session.login()
+                return users_session
+        users_session = Status(self,device)
+        return users_session
+        
+        
+        
     def password_check(self, password):
         return check_password_hash(self.password, password)
+
+class Status(Base):
     
+    __tablename__ = 'status'
+    
+    id = Column(VARCHAR2(255), primary_key=True)
+    
+    user_id = Column(VARCHAR2(255), ForeignKey('user.id'), nullable=False)
+    
+    status = Column(Boolean,default=False,nullable=False)
+    
+    device = Column(VARCHAR2(255), nullable=True)
+    
+    def __init__(self, User, device="127.0.0.1"):
+        self.id = str(uuid.uuid4())
+        self.user_id = User.get_id()
+        self.status = True
+        self.device = device
         
+    def logout(self):
+        self.status = False
+        
+    def login(self):
+        self.status = True
+
 class Role(Base):
+    
     __tablename__ = 'role'
     
-    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True)
+    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True, nullable=False)
+    role = Column(VARCHAR2(255),default="guest", primary_key=True, nullable=False)
+    roles = ['admin', 'teacher', 'student','guest']
     
-    roles = ['admin', 'teacher', 'student']
-    for i in roles:
-        exec(i + ' = Column(Boolean,default=False,nullable=False)')
+    def __init__(self,User):
+        self.id = User.get_id()
+        
+    def add_role(self, role):
+        if role in self.roles:
+            self.role = role
     
-    def __init__(self,id, args):
-        print(id)
-        self.id = id
-        print(args)
-        for i in args:
-            if i in self.roles:
-                exec("self." + i + " =True")
-
-
+    def check_role(self, User, role):
+        roles = session.query(Role).filter_by(id=User.get_id()).all()
+        return any(i.role == role for i in roles)
+    
 class Post(Base):
+    
     __tablename__ = 'post'
     
     id = Column(VARCHAR2(255), primary_key=True)
@@ -85,11 +126,11 @@ class Post(Base):
         
         self.user_id = user_id
 
-
 class Activity(Base):
+    
     __tablename__ = 'activity'
     
-    id = Column(VARCHAR2(255), ForeignKey('user.id'), nullable=False)
+    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True, nullable=False)
 
     activity_count = Column(NUMBER, default=0)
     lastActivity = Column(VARCHAR2(255))
@@ -97,7 +138,7 @@ class Activity(Base):
     def __init__(self, User):
         
         self.id = User.get_id()
-        
+        print("ACTIVITY_EVENT")
         self.lastActivity = str(date.today())
         
     def activity_event(self):
@@ -106,86 +147,44 @@ class Activity(Base):
         
         self.activity_count += 1
         
+'''
+class Teacher(Base):
+    
+    __tablename__ = 'user'
+    
+    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True)
+    
+    experience_body = Column(VARCHAR2(255))
+    
+    position = Column(VARCHAR2(255))
+    
+    experience_years = Column(VARCHAR2(255))
+    
+    photo = Column(VARCHAR2(255))
+    
+    def __init__(self, User):
+        self.id = User.get_id()
+        
+'''
+
+
 
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
-a = User("gay","gay")
+a = User("g22113a11y","gay")
 session.add(a)
+session.flush()
+c = a.login("155.15.15.15")
+session.add(c)
+session.flush()
+c.logout()
+session.flush()
+#b = a.create_activity()
+#session.add(b)
 #session.flush()
 #session.add(Role(a.get_id(), ['admin']))
 #.commit()
 #session.flush()
 #session.close()
-print(a.get_id())
-
-"""
-class Student(Base):
-    __tablename__ = 'student'
-    
-    id = Column(NUMBER, primary_key=True, autoincrement=True)
-    name = Column(VARCHAR2(30), nullable=False)
-    surname = Column(VARCHAR2(30), nullable=False)
-    group = Column(VARCHAR2(30), nullable=False)
-    math = Column(NUMBER)
-    nature = Column(NUMBER)
-    programming = Column(NUMBER)
-    
-    def __init__(self, name, surname, group, math=0, nature=0, programming=0):
-        self.name = name
-        self.surname = surname
-        self.group = group
-        self.math = math
-        self.nature = nature
-        self.programming = programming
-    
-    def __repr__(self):
-        return self.name + ' ' + self.surname
-"""
-
-
-
-
-#Base.metadata.create_all(engine)
-
-'''
-class Disciplines(Base):
-	__tablename__ = 'disciplines'
-	
-	id = Column(NUMBER, primary_key=True, autoincrement=True)
-	discipline = Column(VARCHAR2(30), nullable=True, unique=True)
-	name = Column(VARCHAR2(30), nullable=False, unique=True)
-	path = Column(VARCHAR2(70), nullable=False, unique=True)
-	
-	def __init__(self, discipline, name, path='/home/vlados/kurs/files'):
-		self.discipline = discipline
-		self.name = name
-		self.path = os.path.join(path + '/' + discipline, name)
-	
-	def __repr__(self):
-		return self.discipline + ' : ' + self.name
-'''
-
-# session.add(User('hueta', 'lolkek'))
-# session.commit()
-# session.close()
-# print((session.execute(text("SELECT nickname FROM user")).first()).nickname) - works
-# print((tuple(('gay',)) in (session.execute(text("SELECT nickname FROM user")).fetchall())))
-# print(((session.query(User.nickname).filter_by(nickname = 'gay').all().nickname)))
-# print(type('sar'))
-'''
-username = 'gay',
-password = 'gay',
-if (username + password) in (session.execute(text("SELECT nickname, password FROM user"))).fetchall():
-	print('hello')
-else:
-	print(username + password)
-	print(session.execute(text("SELECT nickname, password FROM user")).fetchall())
-'''
-# update
-'''
-Session = sessionmaker(bind = engine)
-session = Session()
-session.commit()
-'''
-# print(str(session.dirty()) + ' ' + 'DIRTY THIGS WAS MADE ' )
+#print(a.get_id())
