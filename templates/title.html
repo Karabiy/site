@@ -1,0 +1,66 @@
+<html>
+<head>
+	<meta charset="utf-8"/>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/black.css') }}">
+<script src = '/static/main.js'>
+</script>
+<title>
+	Campus
+</title>
+</head>
+<div class = header>
+	<h1>
+	{% if current_user.nickname %}
+	Welcome, {{ current_user }}!
+	{% else %}
+	Hello newbie!
+	{% endif %}
+	That's Campus 2.0
+	</h1>
+</div>
+<body>
+<div class = nav>
+	{% if current_user.nickname %}
+	<a href = '{{url_for('title')}}'> Главная </a>
+	<a href = '{{url_for('materials')}}'> Материалы </a>
+	<a href = '{{url_for('group')}}'> Групы </a>
+	<a href = '{{url_for('logout')}}'> Выйти с аккаунта </a>
+	{% else %}
+	<a href = '{{url_for('login')}}'> Войти в аккаунт </a>
+	{% endif %}
+</div>
+
+<div class = main>
+<div class = aside>
+	<img src="/static/img/приматик.png" width="100%" height="50%" title=Logo align = "right" id = "primat" onclick="change_image()">
+	<p>
+  	Самые активные пользователи месяца
+  	{% for user in session.query(User).order_by(User.activity.asc()).limit(3).all() %}
+  	 <p>
+  	{{ (user.nickname)}} - {{(user.activity)}}
+  	{% endfor %}
+    </p>
+</div>
+
+<div class = news>
+	{% for post in session.query(Post).order_by((Post.post_id)).limit(5).all() %}
+		<p>
+			{{post}}
+	{% endfor %}
+
+	{% if current_user %}
+	<p>
+	<a href = '{{url_for("to_post")}}'> Write your post </a>
+	{% endif %}
+</div>
+</div>
+<div class = footer>
+	<h6>
+	©
+	<p>
+	Ponoiko Vladyslav
+	</p>
+	</h6>
+</div>
+</body>
+</html>

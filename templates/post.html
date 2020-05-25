@@ -1,0 +1,42 @@
+<html>
+<head>
+
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/black.css') }}">
+<meta charset="utf-8"/>
+<title>
+	Campus
+</title>
+</head>
+<div class = header>
+	<h1>
+	Welcome, {{ current_user }}!
+	That's Campus 2.0
+	</h1>
+</div>
+<body>
+<div class = nav>
+	
+	<a href = '{{url_for('title')}}'> Главная </a>
+	<a href = '{{url_for('materials')}}'> Материалы </a>
+	<a href = '{{url_for('group')}}'> Групы </a>
+	<a href = '{{url_for('logout')}}'> Выйти с аккаунта </a>
+</div>
+
+<div class = main>
+<form action ='' method='POST'>
+		<textarea rows='10' cols='50' name = "text">
+		Place your text here
+		</textarea>
+		<input type=submit value=submit>
+</form>
+</div>
+<div class = footer>
+	<h6>
+	©
+	<p>
+	Ponoiko Vladyslav
+	</p>
+	</h6>
+</div>
+</body>
+</html>

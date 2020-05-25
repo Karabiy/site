@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/black.css') }}">
+
+<meta charset="utf-8"/>
+	<title>
+		Group Information
+	</title>
+</head>
+<body>
+<div class = "header">
+	<h1>
+	Campus 2.0
+	</h1>
+</div>
+
+<div class = nav>
+	<a href = '{{url_for('title')}}'> Главная </a>
+	<a href = '{{url_for('materials')}}'> Материалы </a>
+	<a href = '{{url_for('group')}}'> Групы </a>
+	<a href = '{{url_for('logout')}}'> Выйти с аккаунта </a>
+</div>
+
+<div class = main>
+
+	<div class = news>
+		<p>
+		Математика
+		<ul style="list-style-type:circle">
+			{% for info in session.query(Disciplines).filter(Disciplines.discipline == 'math').all()%}
+			<li> 
+				<a href = '{{url_for("download", filename = info.name)}}' >{{info.name}} </a>
+			</li>
+			{% endfor %}
+		</ul>
+		<p>
+		Гуманитарщина
+		<ul style="list-style-type:circle">
+			{% for info in session.query(Disciplines).filter(Disciplines.discipline == 'nature').all()%}
+			<li> 
+				<a href = '{{url_for("download", filename = info.name)}}' >{{info.name}} </a>
+			</li>
+			{% endfor %}
+		</ul>
+		<p>
+		Программирование
+		<ul style="list-style-type:circle">
+			{% for info in session.query(Disciplines).filter(Disciplines.discipline == 'programming').all()%}
+			<li> 
+				<a href = '{{url_for("download",filename = info.name)}}' >{{info.name}} </a>
+			</li>
+			{% endfor %}
+		</ul> 
+	</div>
+</div>
+<div class=footer>
+	<h6>
+	©
+	<p>
+	Ponoiko Vladyslav
+	</p>
+	</h6>
+</div>
+</body>
+</html>

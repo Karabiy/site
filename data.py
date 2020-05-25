@@ -23,7 +23,7 @@ engine = create_engine('oracle+cx_oracle://cherry:mypassword@localhost:51521/xe'
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 session = Session(autocommit=True,autoflush=True)
-cursor = engine.connect()
+#cursor = engine.connect()
 
 class User(UserMixin, Base):
     
@@ -80,6 +80,9 @@ class Status(Base):
         self.status = True
         self.device = device
         
+    def __repr__(self):
+        return str(self.status) + ':' + str(self.device)
+    
     def logout(self):
         self.status = False
         
@@ -168,7 +171,7 @@ class Teacher(Base):
 '''
 
 
-
+"""
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
@@ -188,3 +191,4 @@ session.flush()
 #session.flush()
 #session.close()
 #print(a.get_id())
+"""

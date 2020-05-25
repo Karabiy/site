@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/black.css') }}">
+<meta charset="utf-8"/>
+
+	<title>
+		Group Information
+	</title>
+</head>
+<body>
+
+<div class = "header">
+	<h1>
+	Have a good day, {{current_user}}!
+	</h1>
+</div>
+
+<div class = nav>
+	
+	<a href = '{{url_for('title')}}'> Главная </a>
+	<a href = '{{url_for('materials')}}'> Материалы </a>
+	<a href = '{{url_for('group')}}'> Групы </a>
+	<a href = '{{url_for('logout')}}'> Выйти с аккаунта </a>
+</div>
+
+<div class = main>
+		<table>
+			<tr>
+				<td>Академічна група</td>
+				<td>ПІ</td>
+				<td>Матаналіз</td>
+				<td>Гуманітарщина</td>
+				<td>Програмування</td>
+			</tr>
+			{% for student in session.query(Student).order_by(Student.id).all() %}
+			<tr>
+				<td id = {{student.id}} class="group"> {{student.group}}</td>
+				<td id = {{student.id}} class="name_surname"> {{student.name + ' ' + student.surname}} </td>
+				<td id = {{student.id}} class="math"> {{student.math}} </td>
+				<td id = {{student.id}} class="nature" > {{student.nature}} </td>
+				<td id = {{student.id}} class="programming"> {{student.programming}} </td>
+			</tr>
+			{% endfor %}
+		</table>
+		<p>
+		<form action = '' method="POST">
+			<select id = 'student_name' onclick="change_image()">
+			 	{% for student in session.query(Student).order_by(Student.id).all() %}
+				<option = {{student.id}}>
+					{{student.name + ' ' + student.surname}}
+				</option>
+				{% endfor %}
+				</select> 
+				<br>
+					<input type="number" name="math">
+				<br>
+					<input type="number" name="nature">
+				<br>
+					<input type="number" name="programming">
+				<br>
+		</form>
+</div>
+<div class = footer>
+	<h6>
+	©
+	<p>
+	Ponoiko Vladyslav
+	</p>
+	</h6>
+</div>
+</body>
+</html>
