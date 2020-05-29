@@ -38,6 +38,8 @@
 	{% for post in posts %}
 		<p>
 			{{post.body}}
+			 | author:
+			{{post.user_id}}
 	{% endfor %}
 
 	{% if current_user %}

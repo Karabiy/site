@@ -112,7 +112,7 @@ class Post(Base):
     
     id = Column(VARCHAR2(255), primary_key=True)
     
-    user_id = Column(VARCHAR2(255), ForeignKey('user.id'))
+    user_id = Column(VARCHAR2(255), ForeignKey('user.nickname'))
     
     body = Column(VARCHAR2(255))
     
@@ -125,7 +125,7 @@ class Post(Base):
         
         self.body = body
         
-        self.user_id = User.get_id()
+        self.user_id = User.nickname
         
     def __repr__(self):
         
@@ -176,7 +176,7 @@ Base.metadata.create_all(engine)
 print(engine.table_names())
 
 '''
-a = User("g22113a11y","gay")
+a = User("test","test")
 session.add(a)
 session.flush()
 c = a.login("155.15.15.15")

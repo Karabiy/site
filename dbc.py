@@ -46,7 +46,7 @@ def login():
 		user = get_user(nickname)
 		if validate_user(user, password):
 			login_user(user)
-			return "LOGGED"
+			return redirect("/index")
 		else:
 			redirect(login)
 	else:
@@ -54,7 +54,7 @@ def login():
 
 @app.route('/', methods =["GET"])
 @app.route('/index', methods =["GET"])
-@login_required
+@app.errorhandler(404)
 def index():
 	posts = get_post()
 	return render_template("title.html", posts=posts)
