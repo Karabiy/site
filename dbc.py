@@ -70,7 +70,7 @@ def post():
 	return render_template('post.html')
 
 def get_post():
-	return session.query(Post).order_by(Post.date).limit(5).all()
+	return session.query(Post).limit(5).all()
 
 
 '''
@@ -80,4 +80,4 @@ def test():
 	return Response(), 401
 '''
 
-app.run(debug=True)
+app.run(debug=True, host = '0.0.0.0', port=10000)

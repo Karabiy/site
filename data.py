@@ -130,6 +130,7 @@ class Post(Base):
     def __repr__(self):
         
         return self.body
+
 class Activity(Base):
     
     __tablename__ = 'activity'
