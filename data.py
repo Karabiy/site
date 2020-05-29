@@ -47,18 +47,16 @@ class User(UserMixin, Base):
     
     def create_activity(self):
         return Activity(self)
-    
-    def login(self,device='127.0.0.1'):
-        users_sessions = session.query(Status).filter_by(id=self.get_id()).all()
-        for users_session in users_sessions:
-            if users_session.device == device:
-                users_session.login()
-                return users_session
-        users_session = Status(self,device)
-        return users_session
-        
-        
-        
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
     def password_check(self, password):
         return check_password_hash(self.password, password)
 
@@ -120,15 +118,18 @@ class Post(Base):
     
     date = Column(NUMBER)
     
-    def __init__(self, body, user_id):
+    def __init__(self, User, body):
         self.id = str(uuid.uuid4())
         
         self.date = time.time()
         
         self.body = body
         
-        self.user_id = user_id
-
+        self.user_id = User.get_id()
+        
+    def __repr__(self):
+        
+        return self.body
 class Activity(Base):
     
     __tablename__ = 'activity'
@@ -171,10 +172,10 @@ class Teacher(Base):
 '''
 
 
-"""
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
+'''
 a = User("g22113a11y","gay")
 session.add(a)
 session.flush()
@@ -191,4 +192,4 @@ session.flush()
 #session.flush()
 #session.close()
 #print(a.get_id())
-"""
+'''
