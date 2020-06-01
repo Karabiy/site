@@ -21,19 +21,16 @@
 <body>
 <div class = nav>
 	{% if current_user.nickname %}
-	<a href = '{{url_for('index')}}'> Главная </a>
-	<a href = '{{url_for('post')}}'> Создать пост </a>
-	<a href = '{{url_for('login')}}'> Войти в аккаунт </a>
+	<a href = '{{url_for("index")}}'> Главная </a>
+	<a href = '{{url_for("post")}}'> Создать пост </a>
+	<a href = '{{url_for("logout")}}'> Выйти из аккаунта </a>
+	<a href = '{{url_for("graphics")}}'> Графики и аналитика </a>
+	{% else %}
+	<a href = '{{url_for("login")}}'> Войти в аккаунт </a>
 	{% endif %}
 </div>
 
 <div class = main>
-<div class = aside>
-	Графіки!
-	<p> </p>
-<iframe src="https://jobs.dou.ua/salaries/"> </iframe>
-</div>
-
 <div class = news>
 	{% for post in posts %}
 		<p>

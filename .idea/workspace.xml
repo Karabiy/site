@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05e41a69-c614-435d-be50-d890d3cabe2e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dbc.py" beforeDir="false" afterPath="$PROJECT_DIR$/dbc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oracle.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/get_data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/get_data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/post.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/post.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/title.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/title.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,5 +51,21 @@
       <screen x="67" y="27" width="1773" height="1008" />
     </state>
     <state x="736" y="288" width="424" height="484" key="FileChooserDialogImpl/67.27.1773.1008/1920.0.1840.1035@67.27.1773.1008" timestamp="1590711836167" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data.py</url>
+          <line>182</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/dbc.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

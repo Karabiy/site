@@ -2,12 +2,13 @@ from sqlalchemy import create_engine, Table, Column, Boolean, Integer, String, F
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.pool import QueuePool
-from sqlalchemy.dialects.oracle import \
+"""
+from sqlalchemy.dialects. import \
     BFILE, BLOB, CHAR, CLOB, DATE, \
     DOUBLE_PRECISION, FLOAT, INTERVAL, LONG, NCLOB, \
-    NUMBER, NVARCHAR, NVARCHAR2, RAW, TIMESTAMP, VARCHAR, \
-    VARCHAR2
-import binascii
+    Integer, NVARCHAR, NString, TIMESTAMP, VARCHAR, \
+    String
+"""
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import time
@@ -18,7 +19,7 @@ import os
 os.environ['LD_LIBRARY_PATH'] = "/usr/lib/oracle/18.5/client64/lib"
 os.environ['ORACLE_HOME'] = "/usr/lib/oracle/18.5/client64/"
 
-engine = create_engine('oracle+cx_oracle://cherry:mypassword@localhost:51521/xe', max_identifier_length=128, \
+engine = create_engine('postgresql+pg8000://postgres:postgres@localhost/cherry', max_identifier_length=128, \
                        echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -30,9 +31,9 @@ class User(UserMixin, Base):
     __tablename__ = 'user'
     
     
-    id = Column(VARCHAR2(255), primary_key=True)
-    nickname = Column(VARCHAR2(20), unique=True, nullable=False)
-    password = Column(VARCHAR2(100), nullable=False)
+    id = Column(String(255), primary_key=True)
+    nickname = Column(String(255), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
     
     def __init__(self, nickname, password):
         self.nickname = nickname
@@ -64,13 +65,13 @@ class Status(Base):
     
     __tablename__ = 'status'
     
-    id = Column(VARCHAR2(255), primary_key=True)
+    id = Column(String(255), primary_key=True)
     
-    user_id = Column(VARCHAR2(255), ForeignKey('user.id'), nullable=False)
+    user_id = Column(String(255), ForeignKey('user.id'), nullable=False)
     
     status = Column(Boolean,default=False,nullable=False)
     
-    device = Column(VARCHAR2(255), nullable=True)
+    device = Column(String(255), nullable=True)
     
     def __init__(self, User, device="127.0.0.1"):
         self.id = str(uuid.uuid4())
@@ -91,8 +92,8 @@ class Role(Base):
     
     __tablename__ = 'role'
     
-    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True, nullable=False)
-    role = Column(VARCHAR2(255),default="guest", primary_key=True, nullable=False)
+    id = Column(String(255), ForeignKey('user.id'), primary_key=True, nullable=False)
+    role = Column(String(255),default="guest", primary_key=True, nullable=False)
     roles = ['admin', 'teacher', 'student','guest']
     
     def __init__(self,User):
@@ -110,13 +111,13 @@ class Post(Base):
     
     __tablename__ = 'post'
     
-    id = Column(VARCHAR2(255), primary_key=True)
+    id = Column(String(255), primary_key=True)
     
-    user_id = Column(VARCHAR2(255), ForeignKey('user.nickname'))
+    user_id = Column(String(255), ForeignKey('user.nickname'))
     
-    body = Column(VARCHAR2(255))
+    body = Column(String(255))
     
-    date = Column(NUMBER)
+    date = Column(Integer)
     
     def __init__(self, User, body):
         self.id = str(uuid.uuid4())
@@ -135,10 +136,10 @@ class Activity(Base):
     
     __tablename__ = 'activity'
     
-    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True, nullable=False)
+    id = Column(String(255), ForeignKey('user.id'), primary_key=True, nullable=False)
 
-    activity_count = Column(NUMBER, default=0)
-    lastActivity = Column(VARCHAR2(255))
+    activity_count = Column(Integer, default=0)
+    lastActivity = Column(String(255))
     
     def __init__(self, User):
         
@@ -157,15 +158,15 @@ class Teacher(Base):
     
     __tablename__ = 'user'
     
-    id = Column(VARCHAR2(255), ForeignKey('user.id'), primary_key=True)
+    id = Column(String(255), ForeignKey('user.id'), primary_key=True)
     
-    experience_body = Column(VARCHAR2(255))
+    experience_body = Column(String(255))
     
-    position = Column(VARCHAR2(255))
+    position = Column(String(255))
     
-    experience_years = Column(VARCHAR2(255))
+    experience_years = Column(String(255))
     
-    photo = Column(VARCHAR2(255))
+    photo = Column(String(255))
     
     def __init__(self, User):
         self.id = User.get_id()
@@ -176,15 +177,12 @@ class Teacher(Base):
 Base.metadata.create_all(engine)
 print(engine.table_names())
 
-'''
+
 a = User("test","test")
 session.add(a)
-session.flush()
-c = a.login("155.15.15.15")
-session.add(c)
-session.flush()
-c.logout()
-session.flush()
+#session.flush()
+#session.add(c)
+
 #b = a.create_activity()
 #session.add(b)
 #session.flush()
@@ -193,4 +191,3 @@ session.flush()
 #session.flush()
 #session.close()
 #print(a.get_id())
-'''
